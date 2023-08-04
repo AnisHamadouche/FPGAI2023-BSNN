@@ -1,0 +1,90 @@
+/* 
+*  Spinking Binary Neural Network Tile
+*  
+* 
+*
+* 
+*/
+
+module snn #(
+    parameter N_NEURONS = 4,
+    parameter WEIGHT_WIDTH = 4,
+    parameter DTT_WIDTH = 5,
+    parameter TTD_WIDTH = 5
+    )(
+    input wire CLK,
+    input wire nRST,
+    input wire start,
+    input wire [N_NEURONS-1:0] input_vector [DTT_WIDTH-1:0],
+    input wire [N_NEURONS-1:0] weights [(WEIGHT_WIDTH * 4)-1:0],
+    output wire [N_NEURONS-1:0] output_vector [TTD_WIDTH-1:0],
+    output wire finish
+);
+/*
+
+*/
+
+wire spike_out; 
+wire spike0, spike1, spike2, spike3; 
+wire finish0, finish1, finish2, finish3; 
+wire [3:0] spikes_in; 
+
+
+assign spikes_in = {spike3, spike2, spike1, spike0}; 
+
+snn_lif NRN0 (
+    .CLK(CLK),
+    .nRST(start),
+    .spike_in(spikes_in),
+    .spike_out(spike_out),
+    .weight0(weights[0]),
+    .weight1(weights[1]),
+    .weight2(weights[2]),
+    .weight3(weights[3])
+);
+
+dtt dtt0(
+    .CLK(CLK),
+    .nRES(nRST),
+    .input_vector(input_vector[0]),
+    .start(start),
+    .spike(spike0)
+);
+
+
+dtt dtt1(
+    .CLK(CLK),
+    .nRES(nRST),
+    .input_vector(input_vector[1]),
+    .start(start),
+    .spike(spike1)
+);
+
+dtt dtt2(
+    .CLK(CLK),
+    .nRES(nRST),
+    .input_vector(input_vector[2]),
+    .start(start),
+    .spike(spike2)
+);
+
+dtt dtt3(
+    .CLK(CLK),
+    .nRES(nRST),
+    .input_vector(input_vector[3]),
+    .start(start),
+    .spike(spike3)
+);
+
+
+ttd ttd_inst(
+    .CLK(CLK),
+    .nRES(nRST),
+    .start(start),
+    .spikes(spike_out),
+    .output_vectors(output_vector),
+    .finish(finish)
+);
+
+
+endmodule
