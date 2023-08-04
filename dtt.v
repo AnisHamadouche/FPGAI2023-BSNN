@@ -18,7 +18,7 @@ always @(posedge CLK) begin
         state <= input_vector;
     end
     else if (state == 0)
-        spike <= state;
+        state <= state;
     else begin
         state <= state - 1;
     end
